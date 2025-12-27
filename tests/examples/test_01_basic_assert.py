@@ -14,12 +14,6 @@ import pytest
 
 
 class TestBasicUsage:
-    """기본 사용법 - 이것만 알면 시작할 수 있다
-
-    assert 문의 핵심:
-    - assert 뒤에 True가 되는 조건을 쓴다
-    - 조건이 False면 테스트가 실패한다
-    """
 
     def test_equal(self):
         """두 값이 같은지 확인 (==)"""
@@ -53,3 +47,91 @@ class TestBasicUsage:
         failed = False
         assert success is True
         assert failed is False
+
+
+class TestVariousPatterns:
+    """다양한 패턴 - 상황별 사용법"""
+
+    # --- 숫자 비교 ---
+
+    def test_number_comparison(self):
+        """숫자 크기 비교: <, >, <=, >="""
+        value = 10
+        assert value > 5    # 크다
+        assert value < 20   # 작다
+        assert value >= 10  # 크거나 같다
+        assert value <= 10  # 작거나 같다
+
+    def test_number_range(self):
+        """숫자가 범위 안에 있는지 확인"""
+        score = 85
+        # Python은 연쇄 비교가 가능하다
+        assert 0 <= score <= 100
+
+    # --- 문자열 비교 ---
+
+    def test_string_contains(self):
+        """문자열에 특정 문자가 포함되어 있는지"""
+        message = "hello world"
+        assert "world" in message
+        assert "python" not in message
+
+    def test_string_startswith_endswith(self):
+        """문자열의 시작과 끝 확인"""
+        filename = "report_2024.pdf"
+        assert filename.startswith("report")
+        assert filename.endswith(".pdf")
+
+    # --- 리스트 비교 ---
+
+    def test_list_equal(self):
+        """리스트가 같은지 확인 (순서 포함)"""
+        result = [1, 2, 3]
+        # 리스트 비교는 순서까지 같아야 한다
+        assert result == [1, 2, 3]
+        assert result != [3, 2, 1]
+
+    def test_list_length(self):
+        """리스트 길이 확인"""
+        items = [1, 2, 3, 4, 5]
+        assert len(items) == 5
+
+    # --- 딕셔너리 비교 ---
+
+    def test_dict_equal(self):
+        """딕셔너리가 같은지 확인"""
+        user = {"name": "Alice", "age": 30}
+        assert user == {"name": "Alice", "age": 30}
+
+    def test_dict_key_exists(self):
+        """딕셔너리에 특정 키가 있는지"""
+        config = {"host": "localhost", "port": 8080}
+        # in은 딕셔너리의 키를 확인한다
+        assert "host" in config
+        assert "password" not in config
+
+    def test_dict_value_check(self):
+        """딕셔너리의 특정 키 값 확인"""
+        user = {"name": "Alice", "age": 30}
+        assert user["name"] == "Alice"
+        assert user["age"] == 30
+
+    # --- Truthy / Falsy ---
+
+    def test_truthy_falsy(self):
+        """Truthy/Falsy - 빈 값 체크에 유용
+
+        Falsy: False, None, 0, "", [], {}
+        Truthy: 그 외 모든 값
+        """
+        # 빈 값들은 falsy
+        assert not ""
+        assert not []
+        assert not {}
+        assert not 0
+
+        # 내용이 있는 값들은 truthy
+        assert "hello"
+        assert [1, 2, 3]
+        assert {"a": 1}
+        assert 42
