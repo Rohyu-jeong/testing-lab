@@ -200,4 +200,3 @@ class TestTips:
 
         result_dict = {"x": 0.1 + 0.2}
         assert result_dict == pytest.approx({"x": 0.3})
-        
