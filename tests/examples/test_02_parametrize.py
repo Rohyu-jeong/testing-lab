@@ -22,6 +22,28 @@ def add(a, b):
     return a + b
 
 
+def get_grade(score):
+    """점수에 따른 등급을 반환한다"""
+    if score >= 90:
+        return "A"
+    elif score >= 80:
+        return "B"
+    elif score >= 70:
+        return "C"
+    elif score >= 60:
+        return "D"
+    return "F"
+
+
+def is_valid_username(username):
+    """사용자명이 유효한지 검사한다 (3~10자, 영문숫자만)"""
+    if not username:
+        return False
+    if not 3 <= len(username) <= 10:
+        return False
+    return username.isalnum()
+
+
 class TestBasicUsage:
     """기본 사용법 - 이것만 알면 시작할 수 있다"""
 
@@ -50,3 +72,58 @@ class TestBasicUsage:
         # 가장 흔한 패턴: (입력1, 입력2, 기대값)
         # 튜플의 요소 개수 = 변수 개수 (반드시 일치해야 함)
         assert add(a, b) == expected
+
+
+class TestVariousPatterns:
+    """다양한 패턴 - 상황별 사용법"""
+
+    @pytest.mark.parametrize("score, expected", [
+        (100, "A"),  # 최대값
+        (90, "A"),   # A 최소 경계
+        (89, "B"),   # A 바로 아래 → B
+        (80, "B"),   # B 최소 경계
+        (79, "C"),   # B 바로 아래 → C
+        (70, "C"),   # C 최소 경계
+        (69, "D"),   # C 바로 아래 → D
+        (60, "D"),   # D 최소 경계
+        (59, "F"),   # D 바로 아래 → F
+        (0, "F"),    # 최소값
+    ])
+    def test_boundary_values(self, score, expected):
+        """경계값 테스트 - 버그가 가장 많이 발생하는 지점"""
+        # 왜 경계값인가?
+        #   - if score >= 90 에서 89와 90의 차이가 중요
+        #   - off-by-one 에러가 가장 많이 발생하는 지점
+        assert get_grade(score) == expected
+
+    @pytest.mark.parametrize("username, expected", [
+        pytest.param("abc", True, id="최소길이_3자"),
+        pytest.param("user123", True, id="영문숫자_혼합"),
+        pytest.param("abcdefghij", True, id="최대길이_10자"),
+        pytest.param("", False, id="빈문자열"),
+        pytest.param("ab", False, id="너무짧음_2자"),
+        pytest.param("abcdefghijk", False, id="너무김_11자"),
+        pytest.param("user@name", False, id="특수문자_포함"),
+    ])
+    def test_with_descriptive_ids(self, username, expected):
+        """pytest.param으로 의미있는 테스트 이름 부여"""
+        # 실행 결과:
+        #   test_with_descriptive_ids[최소길이_3자] PASSED
+        #   test_with_descriptive_ids[빈문자열] PASSED
+        #
+        # id를 사용하면:
+        #   - 실패 시 어떤 케이스인지 바로 파악 가능
+        #   - 테스트 리포트가 읽기 쉬워짐
+        assert is_valid_username(username) == expected
+
+    @pytest.mark.parametrize("a", [1, 2])
+    @pytest.mark.parametrize("b", [10, 20])
+    def test_combinations(self, a, b):
+        """여러 @parametrize 조합 - 모든 경우의 수 테스트"""
+        # 2 x 2 = 4개 조합이 자동 생성됨:
+        #   (a=1, b=10), (a=1, b=20), (a=2, b=10), (a=2, b=20)
+        #
+        # 언제 유용한가?
+        #   - 여러 독립 변수의 조합을 테스트할 때
+        #   - 예: 브라우저 x 화면크기, 언어 x 지역
+        assert add(a, b) == a + b
