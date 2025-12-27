@@ -135,3 +135,42 @@ class TestVariousPatterns:
         assert [1, 2, 3]
         assert {"a": 1}
         assert 42
+
+
+class TestCommonMistakes:
+    """흔한 실수 - 이렇게 하면 안 된다"""
+
+    def test_is_vs_equal(self):
+        """[실수] 값 비교에 is를 사용하면 안 된다
+
+        is: 같은 객체인가? (동일성)
+        ==: 값이 같은가? (동등성)
+        """
+        list1 = [1, 2, 3]
+        list2 = [1, 2, 3]
+
+        # 잘못된 방법: 값 비교에 is 사용
+        # assert list1 is list2  # 실패! 다른 객체이므로
+
+        # 올바른 방법: 값 비교에 == 사용
+        assert list1 == list2
+
+    def test_none_with_is(self):
+        """[실수] None 비교에 ==를 사용하면 안 된다"""
+        value = None
+
+        # 잘못된 방법
+        # assert value == None  # 동작은 하지만 PEP 8 위반
+
+        # 올바른 방법: None은 싱글톤이므로 is 사용
+        assert value is None
+
+    def test_float_with_approx(self):
+        """[실수] 부동소수점을 ==로 직접 비교하면 안 된다"""
+        result = 0.1 + 0.2
+
+        # 잘못된 방법
+        # assert result == 0.3  # 실패! 0.30000000000000004
+
+        # 올바른 방법: pytest.approx() 사용
+        assert result == pytest.approx(0.3)
