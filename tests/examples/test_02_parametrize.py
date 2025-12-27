@@ -127,3 +127,57 @@ class TestVariousPatterns:
         #   - 여러 독립 변수의 조합을 테스트할 때
         #   - 예: 브라우저 x 화면크기, 언어 x 지역
         assert add(a, b) == a + b
+
+
+class TestCommonMistakes:
+    """흔한 실수 - 이렇게 하면 안 된다"""
+
+    # 잘못된 예 - 실행하면 에러 발생
+    # @pytest.mark.parametrize("a, b", [(1, 2, 3)])  # 변수 2개, 값 3개
+
+    @pytest.mark.parametrize("a, b, c", [
+        (1, 2, 3),
+        (4, 5, 9),
+    ])
+    def test_param_count_must_match(self, a, b, c):
+        """파라미터 개수 = 튜플 요소 개수"""
+        # 규칙: "a, b, c" → 3개 변수 → 튜플도 3개 요소
+        assert a + b == c
+
+    # 잘못된 예 - 실행하면 TypeError
+    # @pytest.mark.parametrize("value", 1)
+
+    @pytest.mark.parametrize("value", [1])
+    def test_value_must_be_in_list(self, value):
+        """단일 값도 반드시 리스트로 감싸야 한다"""
+        assert value == 1
+
+    # 주의: 문자열은 iterable이므로 각 문자가 분리됨!
+    # @pytest.mark.parametrize("char", "abc")
+    # → 'a', 'b', 'c' 3개의 테스트가 생성됨
+
+    @pytest.mark.parametrize("text", ["abc"])
+    def test_string_must_be_wrapped(self, text):
+        """문자열 하나를 전달하려면 리스트로 감싸야 한다"""
+        # ["abc"] → 1개 테스트, text="abc"
+        # "abc"   → 3개 테스트, text='a', 'b', 'c'
+        assert text == "abc"
+
+    # 나쁜 패턴
+    # def test_without_parametrize(self):
+    #     assert add(1, 2) == 3
+    #     assert add(0, 0) == 0  # 위에서 실패하면 여기는 실행 안 됨
+    #     assert add(-1, 1) == 0
+
+    @pytest.mark.parametrize("a, b, expected", [
+        (1, 2, 3),
+        (0, 0, 0),
+        (-1, 1, 0),
+    ])
+    def test_each_case_runs_independently(self, a, b, expected):
+        """parametrize 사용 - 모든 값이 독립적으로 실행됨"""
+        # 장점:
+        #   - 하나가 실패해도 나머지는 계속 실행
+        #   - 어떤 값에서 실패했는지 명확히 알 수 있음
+        assert add(a, b) == expected
+
