@@ -9,7 +9,7 @@
 
 이 저장소는 **pytest의 핵심 기능 4가지**만 빠르게 익히는 것을 목표로 합니다.
 
-python-basic-lab을 학습할 때 필요한 **최소한의 테스트 지식**만 담았습니다.
+testing-lab을 학습할 때 필요한 **최소한의 테스트 지식**만 담았습니다.
 
 ```
 "테스트 도구를 배우느라 정작 Python 공부를 못하면 안 되니까"
@@ -17,17 +17,17 @@ python-basic-lab을 학습할 때 필요한 **최소한의 테스트 지식**만
 
 ## 🎯 학습 목표
 
-- pytest **설치부터 실행**까지 5분 안에 완료
+- pytest **설치부터 실행**까지 완료
 - 기본 **assertion**으로 코드 동작 검증
 - **parametrize**로 여러 케이스 한 번에 테스트
 - **fixture**로 테스트 데이터 재사용
 
 ## 🛠 기술 스택
 
-| 구분 | 기술 |
-|------|------|
+| 구분 | 기술           |
+|------|--------------|
 | Language | Python 3.10+ |
-| Test Framework | pytest 8.0 |
+| Test Framework | pytest 9.0   |
 
 ## 📁 프로젝트 구조
 
@@ -38,7 +38,9 @@ testing-lab/
 ├── requirements.txt
 │
 └── tests/
+    ├── __init__.py
     └── examples/
+        ├── __init__.py
         ├── test_01_basic_assert.py      # 기본 assert
         ├── test_02_parametrize.py       # 여러 케이스 한번에
         ├── test_03_exception.py         # 예외 테스트
@@ -47,10 +49,8 @@ testing-lab/
 
 ## 📚 학습 내용
 
-### 4개 파일, 30분이면 충분합니다
-
 <details>
-<summary><b>01. Basic Assert</b> - 기본 검증 (10분)</summary>
+<summary><b>01. Basic Assert</b> - 기본 검증 </summary>
 
 | 내용 | 설명 |
 |------|------|
@@ -76,7 +76,7 @@ def test_simple():
 </details>
 
 <details>
-<summary><b>02. Parametrize</b> - 여러 케이스 테스트 (10분)</summary>
+<summary><b>02. Parametrize</b> - 여러 케이스 테스트 </summary>
 
 | 내용 | 설명 |
 |------|------|
@@ -103,7 +103,7 @@ def test_double(input, expected):
 </details>
 
 <details>
-<summary><b>03. Exception</b> - 예외 테스트 (5분)</summary>
+<summary><b>03. Exception</b> - 예외 테스트 </summary>
 
 | 내용 | 설명 |
 |------|------|
@@ -125,7 +125,7 @@ def test_divide_by_zero():
 </details>
 
 <details>
-<summary><b>04. Fixture Intro</b> - 테스트 데이터 준비 (5분)</summary>
+<summary><b>04. Fixture Intro</b> - 테스트 데이터 준비 </summary>
 
 | 내용 | 설명 |
 |------|------|
@@ -192,7 +192,7 @@ pytest --tb=short         # 에러 메시지 짧게
 
 ## ✅ 체크리스트
 
-이 4가지만 할 줄 알면 python-basic-lab을 시작할 수 있습니다:
+이 4가지만 할 줄 알면 testing-lab을 시작할 수 있습니다:
 
 - [ ] `assert`로 값 비교하기
 - [ ] `@pytest.mark.parametrize`로 여러 케이스 테스트
