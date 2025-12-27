@@ -174,3 +174,30 @@ class TestCommonMistakes:
 
         # 올바른 방법: pytest.approx() 사용
         assert result == pytest.approx(0.3)
+
+
+class TestTips:
+    """꿀팁 - 알아두면 유용한 것들"""
+
+    def test_assert_message(self):
+        """실패 시 원인 파악을 위한 메시지 추가"""
+        value = 42
+        # 쉼표 뒤에 메시지를 추가하면 실패 시 출력된다
+        assert value > 0, f"값이 양수여야 합니다. 현재 값: {value}"
+
+    def test_approx_tolerance(self):
+        """pytest.approx()에 허용 오차 지정하기"""
+        # rel: 상대 오차 (비율)
+        assert 99.5 == pytest.approx(100, rel=0.01)  # 1% 오차 허용
+
+        # abs: 절대 오차 (고정값)
+        assert 99.5 == pytest.approx(100, abs=0.5)  # 0.5 차이 허용
+
+    def test_approx_collection(self):
+        """리스트/딕셔너리의 부동소수점도 approx로 비교"""
+        result_list = [0.1 + 0.1, 0.1 + 0.2]
+        assert result_list == pytest.approx([0.2, 0.3])
+
+        result_dict = {"x": 0.1 + 0.2}
+        assert result_dict == pytest.approx({"x": 0.3})
+        
