@@ -181,3 +181,34 @@ class TestCommonMistakes:
         #   - 어떤 값에서 실패했는지 명확히 알 수 있음
         assert add(a, b) == expected
 
+
+class TestTips:
+    """꿀팁 - 알아두면 유용한 것들"""
+
+    GRADE_CASES = [
+        pytest.param(95, "A", id="수"),
+        pytest.param(85, "B", id="우"),
+        pytest.param(75, "C", id="미"),
+        pytest.param(65, "D", id="양"),
+        pytest.param(55, "F", id="가"),
+    ]
+
+    @pytest.mark.parametrize("score, expected", GRADE_CASES)
+    def test_with_separated_data(self, score, expected):
+        """테스트 데이터를 변수로 분리하면 재사용과 관리가 쉽다"""
+        # 장점:
+        #   - 같은 데이터를 여러 테스트에서 재사용 가능
+        #   - 데이터 수정 시 한 곳만 변경하면 됨
+        #   - 테스트 함수가 깔끔해짐
+        assert get_grade(score) == expected
+
+    @pytest.mark.parametrize("a, b, expected", [
+        (1, 2, 3),
+        (10, 20, 30),
+        (-5, 5, 0),
+    ])
+    def test_with_failure_message(self, a, b, expected):
+        """assert에 메시지를 추가하면 실패 원인 파악이 쉽다"""
+        result = add(a, b)
+        # 실패 시: AssertionError: 1 + 2 = 3이어야 하는데 4가 나옴
+        assert result == expected, f"{a} + {b} = {expected}이어야 하는데 {result}가 나옴"
