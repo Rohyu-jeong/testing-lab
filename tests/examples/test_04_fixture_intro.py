@@ -1,0 +1,66 @@
+"""
+pytest 기초 - Fixture 맛보기
+===========================
+학습 목표: fixture로 테스트 데이터를 준비하고 정리하는 방법
+
+사용 상황:
+- 여러 테스트에서 같은 데이터를 사용할 때
+- 테스트 전에 준비 작업이 필요할 때
+- 테스트 후에 정리 작업이 필요할 때
+- 복잡한 객체를 미리 만들어두고 싶을 때
+"""
+
+import pytest
+
+
+# Fixture 정의 - 테스트에서 사용할 데이터를 미리 준비
+# 이 파일 안에서만 쓰는 fixture는 여기에 정의
+# 여러 파일에서 공유하려면 conftest.py에 정의 (import 없이 자동 인식)
+
+@pytest.fixture
+def sample_list():
+    """단순한 리스트를 제공하는 fixture"""
+    return [1, 2, 3, 4, 5]
+
+
+@pytest.fixture
+def sample_dict():
+    """단순한 딕셔너리를 제공하는 fixture"""
+    return {"name": "python", "version": 3}
+
+
+@pytest.fixture
+def empty_list():
+    """빈 리스트를 제공하는 fixture"""
+    return []
+
+
+class TestBasicUsage:
+    """기본 사용법 - 이것만 알면 시작할 수 있다"""
+
+    def test_fixture_injection(self, sample_list):
+        """fixture는 함수 파라미터로 받아서 사용한다"""
+        # sample_list fixture가 자동으로 주입됨
+        # 테스트 함수 파라미터 이름 = fixture 함수 이름
+        assert sample_list == [1, 2, 3, 4, 5]
+        assert len(sample_list) == 5
+
+    def test_fixture_provides_fresh_data(self, sample_list):
+        """각 테스트는 새로운 fixture 데이터를 받는다"""
+        # 이전 테스트에서 sample_list를 수정해도
+        # 이 테스트는 새로운 [1, 2, 3, 4, 5]를 받음
+        sample_list.append(6)
+        assert len(sample_list) == 6
+
+    def test_fixture_still_fresh(self, sample_list):
+        """위에서 append(6)을 했지만 여기는 영향 없음"""
+        # fixture는 매번 새로 실행됨
+        assert sample_list == [1, 2, 3, 4, 5]
+        assert 6 not in sample_list
+
+    def test_multiple_fixtures(self, sample_list, sample_dict):
+        """여러 fixture를 동시에 사용할 수 있다"""
+        # 필요한 만큼 파라미터로 받으면 됨
+        assert len(sample_list) == 5
+        assert sample_dict["name"] == "python"
+
