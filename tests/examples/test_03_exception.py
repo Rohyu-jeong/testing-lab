@@ -60,3 +60,108 @@ class TestBasicUsage:
         # match로 메시지를 확인해서 의도한 곳에서 발생했는지 구분
         with pytest.raises(ValueError, match="invalid"):
             int("hello")
+
+
+class TestVariousPatterns:
+    """다양한 패턴 - assert와 parametrize 응용"""
+
+    def test_assert_exception_message(self):
+        """assert로 예외 메시지 검증"""
+        def divide(a, b):
+            if b == 0:
+                raise ValueError("0으로 나눌 수 없습니다")
+            return a / b
+
+        with pytest.raises(ValueError) as exc_info:
+            divide(10, 0)
+
+        # exc_info.value를 문자열로 변환해서 메시지 추출
+        message = str(exc_info.value)
+
+        # 1번에서 배운 assert로 메시지 검증
+        # 정확히 일치하는지 확인
+        assert message == "0으로 나눌 수 없습니다"
+
+        # 특정 문자열이 포함되어 있는지 확인
+        assert "0" in message
+
+    @pytest.mark.parametrize("invalid_value", [
+        "hello",
+        "abc",
+        "!@#",
+    ])
+    def test_parametrize_single_exception(self, invalid_value):
+        """parametrize로 여러 잘못된 입력 테스트"""
+        # 2번에서 배운 parametrize로 여러 케이스를 한번에 테스트
+        # 모든 invalid_value에 대해 ValueError가 발생해야 함
+        with pytest.raises(ValueError):
+            int(invalid_value)
+
+    @pytest.mark.parametrize("value,expected_exception", [
+        ("hello", ValueError),   # 문자열 -> ValueError
+        (None, TypeError),       # None -> TypeError
+    ])
+    def test_parametrize_different_exceptions(self, value, expected_exception):
+        """parametrize로 입력별 다른 예외 테스트"""
+        def to_int(x):
+            if x is None:
+                raise TypeError("None은 변환 불가")
+            return int(x)
+
+        # 입력값에 따라 다른 예외가 발생하는 것을 테스트
+        # expected_exception에 예외 클래스를 넣어서 동적으로 검증
+        with pytest.raises(expected_exception):
+            to_int(value)
+
+    @pytest.mark.parametrize("value,error_message", [
+        pytest.param(-1, "음수", id="negative"),
+        pytest.param(101, "100 초과", id="over_100"),
+    ])
+    def test_parametrize_with_message_check(self, value, error_message):
+        """parametrize + match 조합"""
+        def validate_score(score):
+            if score < 0:
+                raise ValueError("음수는 안 됨")
+            if score > 100:
+                raise ValueError("100 초과는 안 됨")
+            return score
+
+        # parametrize로 여러 케이스 + match로 메시지 검증
+        # pytest.param의 id는 테스트 실행 시 어떤 케이스인지 보여줌
+        with pytest.raises(ValueError, match=error_message):
+            validate_score(value)
+
+    def test_multiple_exception_types(self):
+        """여러 예외 타입 중 하나 기대"""
+        def process(value):
+            if value is None:
+                raise TypeError("None 안 됨")
+            if value < 0:
+                raise ValueError("음수 안 됨")
+            return value
+
+        # 튜플로 여러 예외 타입 지정 가능
+        # 둘 중 하나가 발생하면 테스트 통과
+        # 어떤 예외가 발생할지 정확히 모를 때 유용
+        with pytest.raises((TypeError, ValueError)):
+            process(None)
+
+        with pytest.raises((TypeError, ValueError)):
+            process(-1)
+
+    def test_multiple_asserts_after_catch(self):
+        """예외 잡은 후 여러 검증 수행"""
+        def parse(text):
+            if not text:
+                raise ValueError("빈 문자열 불가")
+            return int(text)
+
+        with pytest.raises(ValueError) as exc_info:
+            parse("")
+
+        # with 블록이 끝난 후에 exc_info를 사용해서
+        # 여러 가지 검증을 자유롭게 수행할 수 있음
+        assert exc_info.type is ValueError
+        assert "빈 문자열" in str(exc_info.value)
+        assert str(exc_info.value) == "빈 문자열 불가"
+
