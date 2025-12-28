@@ -165,3 +165,62 @@ class TestVariousPatterns:
         assert "빈 문자열" in str(exc_info.value)
         assert str(exc_info.value) == "빈 문자열 불가"
 
+
+class TestCommonMistakes:
+    """흔한 실수 - 이렇게 하면 안 된다"""
+
+    def test_wrong_exception_type(self):
+        """잘못된 예외 타입을 기대하면 테스트 실패"""
+        # int("hello")는 ValueError를 발생시킴
+        # 만약 TypeError를 기대하면 테스트가 실패함
+        #
+        # 잘못된 예:
+        # with pytest.raises(TypeError):  # 실패!
+        #     int("hello")
+
+        # 올바른 예: 실제 발생하는 예외 타입을 지정
+        with pytest.raises(ValueError):
+            int("hello")
+
+    def test_no_exception_means_failure(self):
+        """예외가 발생하지 않으면 테스트 실패"""
+        # pytest.raises는 예외가 반드시 발생해야 통과
+        # 정상 동작하는 코드를 넣으면 테스트 실패
+        #
+        # 잘못된 예:
+        # with pytest.raises(ValueError):
+        #     int("123")  # 정상 동작 -> 예외 없음 -> 테스트 실패
+
+        # 예외가 없어야 하는 경우는 pytest.raises 없이 그냥 실행
+        result = int("123")
+        assert result == 123
+
+    def test_exception_outside_block(self):
+        """예외는 with 블록 안에서 발생해야 함"""
+        # pytest.raises는 with 블록 안의 예외만 잡음
+        # 블록 밖에서 예외가 발생하면 테스트 자체가 실패
+        #
+        # 잘못된 예:
+        # x = int("hello")  # 여기서 예외 발생 -> 테스트 실패!
+        # with pytest.raises(ValueError):
+        #     pass
+
+        # 올바른 예: 예외 발생 코드를 with 블록 안에 넣기
+        with pytest.raises(ValueError):
+            int("hello")
+
+    def test_avoid_broad_exception(self):
+        """Exception은 너무 광범위"""
+        # Exception은 모든 예외의 부모 클래스
+        # 이걸로 잡으면 어떤 예외든 통과해버림
+
+        # 광범위한 예 (권장하지 않음):
+        with pytest.raises(Exception):
+            int("hello")
+
+        # 구체적인 예 (권장):
+        # 실제로 발생하는 예외 타입을 명시하면
+        # 의도하지 않은 예외를 잡는 실수를 방지할 수 있음
+        with pytest.raises(ValueError):
+            int("hello")
+
