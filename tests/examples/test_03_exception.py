@@ -224,3 +224,48 @@ class TestCommonMistakes:
         with pytest.raises(ValueError):
             int("hello")
 
+
+class TestTips:
+    """꿀팁 - 알아두면 유용한 것들"""
+
+    def test_no_exception_case(self):
+        """예외가 발생하지 않아야 하는 케이스"""
+        def safe_divide(a, b):
+            if b == 0:
+                return 0  # 예외 대신 기본값 반환
+            return a / b
+
+        # 예외가 발생하지 않아야 하는 경우는
+        # pytest.raises 없이 그냥 호출하고 결과를 검증
+        assert safe_divide(10, 2) == 5
+        assert safe_divide(10, 0) == 0  # 0으로 나눠도 예외 없이 0 반환
+
+    def test_explicit_no_exception(self):
+        """예외가 발생하면 안 된다는 것을 명시적으로 표현"""
+        def double(x):
+            return x * 2
+
+        # "예외가 없어야 함"을 강조하고 싶을 때
+        # try-except로 감싸고 예외 발생 시 pytest.fail 호출
+        try:
+            result = double(5)
+        except Exception as e:
+            pytest.fail(f"예외 발생: {e}")
+
+        assert result == 10
+
+    def test_normal_and_exception_together(self):
+        """같은 함수의 정상/예외 케이스 함께 테스트"""
+        def divide(a, b):
+            if b == 0:
+                raise ValueError("0으로 못 나눔")
+            return a / b
+
+        # 정상 케이스: 일반 assert로 검증
+        assert divide(10, 2) == 5
+        assert divide(9, 3) == 3
+
+        # 예외 케이스: pytest.raises로 검증
+        # 하나의 테스트에서 정상/예외 케이스를 모두 확인할 수 있음
+        with pytest.raises(ValueError):
+            divide(10, 0)
