@@ -64,3 +64,33 @@ class TestBasicUsage:
         assert len(sample_list) == 5
         assert sample_dict["name"] == "python"
 
+
+class TestFixtureDependency:
+    """Fixture 간 의존성 - fixture가 다른 fixture를 사용"""
+
+    # fixture가 다른 fixture를 파라미터로 받을 수 있음
+
+    @pytest.fixture
+    def doubled_list(self, sample_list):
+        """sample_list의 각 원소를 2배로 만든 리스트"""
+        return [x * 2 for x in sample_list]
+
+    @pytest.fixture
+    def list_with_sum(self, sample_list):
+        """리스트와 합계를 함께 제공"""
+        return {
+            "items": sample_list,
+            "total": sum(sample_list)
+        }
+
+    def test_dependent_fixture(self, doubled_list):
+        """다른 fixture에 의존하는 fixture 사용"""
+        # doubled_list는 내부적으로 sample_list를 사용
+        assert doubled_list == [2, 4, 6, 8, 10]
+
+    def test_fixture_with_computed_value(self, list_with_sum):
+        """계산된 값을 포함하는 fixture"""
+        assert list_with_sum["items"] == [1, 2, 3, 4, 5]
+        assert list_with_sum["total"] == 15
+
+        
