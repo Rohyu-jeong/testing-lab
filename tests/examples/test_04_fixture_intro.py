@@ -189,3 +189,38 @@ class TestPracticalExamples:
         assert len(cart_with_items["items"]) == 2
         assert cart_with_items["total"] == 5500  # 3000 + 2500
 
+
+class TestCommonMistakes:
+    """흔한 실수 - 이렇게 하면 안 된다"""
+
+    @pytest.fixture
+    def mutable_data(self):
+        """변경 가능한 데이터"""
+        return {"count": 0}
+
+    def test_wrong_fixture_name(self):
+        """
+        [실수] fixture 이름을 잘못 쓰면 에러 발생
+
+        # 이렇게 하면 에러:
+        # def test_wrong(self, mutable_dataa):  # 오타!
+        #     pass
+        #
+        # fixture 'mutable_dataa' not found 에러 발생
+        """
+        assert True
+
+    def test_dont_modify_shared_assumption(self, mutable_data):
+        """
+        [주의] fixture 수정이 다른 테스트에 영향줄 것 같지만 안 준다
+
+        각 테스트마다 fixture가 새로 실행되므로
+        mutable_data를 수정해도 다른 테스트에 영향 없음
+        """
+        mutable_data["count"] += 1
+        assert mutable_data["count"] == 1
+
+    def test_fixture_is_fresh(self, mutable_data):
+        """위 테스트에서 count를 올렸지만 여기는 0"""
+        assert mutable_data["count"] == 0
+
