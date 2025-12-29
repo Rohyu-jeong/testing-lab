@@ -224,3 +224,52 @@ class TestCommonMistakes:
         """위 테스트에서 count를 올렸지만 여기는 0"""
         assert mutable_data["count"] == 0
 
+
+class TestTips:
+    """꿀팁 - 알아두면 유용한 것들"""
+
+    @pytest.fixture
+    def numbers(self):
+        """숫자 리스트"""
+        return [10, 20, 30]
+
+    @pytest.fixture
+    def calculator(self):
+        """간단한 계산기 딕셔너리"""
+        def add(a, b):
+            return a + b
+
+        def multiply(a, b):
+            return a * b
+
+        return {"add": add, "multiply": multiply}
+
+    def test_fixture_can_return_functions(self, calculator):
+        """fixture는 함수도 반환할 수 있다"""
+        assert calculator["add"](2, 3) == 5
+        assert calculator["multiply"](4, 5) == 20
+
+    def test_combine_fixtures_in_test(self, numbers, calculator):
+        """여러 fixture를 조합해서 사용"""
+        total = calculator["add"](numbers[0], numbers[1])
+        assert total == 30
+
+    def test_fixture_for_repeated_setup(self, numbers):
+        """
+        반복되는 설정은 fixture로 추출
+
+        Before (매 테스트마다 반복):
+            def test_a(self):
+                numbers = [10, 20, 30]
+                ...
+            def test_b(self):
+                numbers = [10, 20, 30]
+                ...
+
+        After (fixture 사용):
+            def test_a(self, numbers):
+                ...
+            def test_b(self, numbers):
+                ...
+        """
+        assert sum(numbers) == 60
