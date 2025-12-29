@@ -142,3 +142,50 @@ class TestFixtureWithYield:
         assert temp_file_simulation["exists"] is True
         assert temp_file_simulation["name"] == "test.txt"
 
+
+class TestPracticalExamples:
+    """실용적인 예제 - 이런 상황에서 fixture를 쓴다"""
+
+    @pytest.fixture
+    def user_data(self):
+        """사용자 데이터 fixture"""
+        return {
+            "id": 1,
+            "name": "홍길동",
+            "email": "hong@example.com",
+            "active": True
+        }
+
+    @pytest.fixture
+    def shopping_cart(self):
+        """장바구니 fixture"""
+        return {
+            "items": [],
+            "total": 0
+        }
+
+    @pytest.fixture
+    def cart_with_items(self, shopping_cart):
+        """상품이 담긴 장바구니"""
+        shopping_cart["items"] = [
+            {"name": "사과", "price": 1000, "qty": 3},
+            {"name": "바나나", "price": 500, "qty": 5}
+        ]
+        shopping_cart["total"] = 1000 * 3 + 500 * 5
+        return shopping_cart
+
+    def test_user_is_active(self, user_data):
+        """사용자 활성 상태 확인"""
+        assert user_data["active"] is True
+        assert "@" in user_data["email"]
+
+    def test_empty_cart(self, shopping_cart):
+        """빈 장바구니 테스트"""
+        assert shopping_cart["items"] == []
+        assert shopping_cart["total"] == 0
+
+    def test_cart_total(self, cart_with_items):
+        """장바구니 합계 테스트"""
+        assert len(cart_with_items["items"]) == 2
+        assert cart_with_items["total"] == 5500  # 3000 + 2500
+
