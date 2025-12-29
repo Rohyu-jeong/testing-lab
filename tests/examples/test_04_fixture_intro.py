@@ -93,4 +93,52 @@ class TestFixtureDependency:
         assert list_with_sum["items"] == [1, 2, 3, 4, 5]
         assert list_with_sum["total"] == 15
 
-        
+
+class TestFixtureWithYield:
+    """Setup과 Teardown - yield로 정리 작업하기"""
+
+    @pytest.fixture
+    def resource_with_cleanup(self):
+        """
+        yield 전: setup (준비)
+        yield 값: 테스트에서 사용할 데이터
+        yield 후: teardown (정리)
+        """
+        # Setup: 테스트 전에 실행
+        data = {"status": "created", "items": []}
+        print("\n[Setup] 리소스 생성됨")
+
+        yield data  # 이 값이 테스트에 전달됨
+
+        # Teardown: 테스트 후에 실행 (성공/실패 상관없이)
+        data.clear()
+        print("[Teardown] 리소스 정리됨")
+
+    @pytest.fixture
+    def temp_file_simulation(self):
+        """파일 생성/삭제를 시뮬레이션하는 fixture"""
+        # 실제로는 파일을 만들지 않고 시뮬레이션
+        file_info = {"name": "test.txt", "exists": True}
+        print(f"\n[Setup] 파일 생성: {file_info['name']}")
+
+        yield file_info
+
+        file_info["exists"] = False
+        print(f"[Teardown] 파일 삭제: {file_info['name']}")
+
+    def test_resource_is_ready(self, resource_with_cleanup):
+        """yield 이전 코드가 실행된 후 테스트 시작"""
+        assert resource_with_cleanup["status"] == "created"
+        resource_with_cleanup["items"].append("test_item")
+
+    def test_cleanup_runs_after(self, resource_with_cleanup):
+        """각 테스트 후 정리 코드가 실행됨"""
+        # 이전 테스트에서 추가한 item이 없음
+        # (새로운 fixture 인스턴스이므로)
+        assert resource_with_cleanup["items"] == []
+
+    def test_temp_file_available(self, temp_file_simulation):
+        """임시 파일이 테스트 중에는 존재"""
+        assert temp_file_simulation["exists"] is True
+        assert temp_file_simulation["name"] == "test.txt"
+
