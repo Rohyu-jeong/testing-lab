@@ -3,7 +3,7 @@
 > pytest 기초, 이것만 알면 Python 학습 테스트를 시작할 수 있다
 
 [![Python Version](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![pytest Version](https://img.shields.io/badge/pytest-8.0-green.svg)](https://docs.pytest.org/)
+[![pytest Version](https://img.shields.io/badge/pytest-9.0-green.svg)](https://docs.pytest.org/)
 
 ## 📌 소개
 
